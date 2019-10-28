@@ -1,0 +1,27 @@
+sudo: required
+services:
+  - docker
+
+# building testing version of the react client image 
+# here client is the only stage that has tests
+# for others the process would be similar
+before_install:
+  - docker build -t elinasmj/react-tests -f ./client/Dockerfile.dev ./client
+
+# run tests
+script:
+  - docker run -e CI=true elinasmj/react-tests npm test
+
+# building production version of images
+after_success:
+  - docker build -t elinasmj/multi-client ./client
+  - docker build -t elinasmj/multi-server ./server
+  - docker build -t elinasmj/multi-nginx ./nginx
+  - docker build -t elinasmj/multi-worker ./worker
+  # Log in to the docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Take those images and push them to docker hub
+  - docker push elinasmj/multi-client
+  - docker push elinasmj/multi-server
+  - docker push elinasmj/multi-nginx
+  - docker push elinasmj/multi-worker
