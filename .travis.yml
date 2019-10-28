@@ -25,3 +25,18 @@ after_success:
   - docker push elinasmj/multi-server
   - docker push elinasmj/multi-nginx
   - docker push elinasmj/multi-worker
+
+deploy:
+  provider: elasticbeanstalk
+  region: eu-west-3
+  app: multi-docker
+  env: MultiDocker-env
+  bucket_name: elasticbeanstalk-eu-west-3-843699157666
+  bucket_path: multi-docker
+  on:
+    branch: master
+  access_key_id: 
+    secure: $AWS_ACCESS_KEY
+  secret_access_key:
+    secure: $AWS_SECRET_KEY
+
